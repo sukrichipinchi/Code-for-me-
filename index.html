@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Olmec Quiz Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1a1a2e;
+      color: #ffffff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    .screen {
+      display: none;
+      padding: 40px;
+    }
+    .active {
+      display: block;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background-color: #16213e;
+      padding: 30px;
+      border-radius: 15px;
+    }
+    h1, h2 {
+      color: #ffd700;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin-top: 20px;
+      background: #e94560;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .question {
+      margin: 20px 0;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin: 8px 0;
+      cursor: pointer;
+    }
+    #result {
+      font-size: 24px;
+      color: #06d6a0;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="start-screen" class="screen active">
+  <div class="container">
+    <h1>Olmec History Quiz</h1>
+    <p>Test your knowledge about the ancient Olmecs in 3 rounds.</p>
+    <button onclick="startGame()">Start Game</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="screen">
+  <div class="container">
+    <h2 id="round-title">Round 1</h2>
+    <form id="quiz-form">
+      <div id="questions-container"></div>
+      <button type="submit">Next</button>
+    </form>
+  </div>
+</div>
+
+<div id="end-screen" class="screen">
+  <div class="container">
+    <h1>Quiz Finished</h1>
+    <p id="final-score"></p>
+    <button onclick="restartGame()">Play Again</button>
+  </div>
+</div>
+
+<script>
+  const rounds = [
+    [ // Round 1
+      { q: "Who were the Olmecs?", a: "B", options: ["Vikings", "Ancient Mesoamerican people", "Egyptians"] },
+      { q: "What are they famous for?", a: "B", options: ["Gold jewelry", "Stone heads", "Castles"] },
+      { q: "What did they build?", a: "C", options: ["Boats", "Mines", "Pyramids"] }
+    ],
+    [ // Round 2
+      { q: "Where did the Olmecs live?", a: "A", options: ["Mexico", "Peru", "Brazil"] },
+      { q: "What did they worship?", a: "B", options: ["Eagle", "Jaguar", "Fish"] },
+      { q: "What did they invent?", a: "C", options: ["Gunpowder", "Paper", "Calendar"] }
+    ],
+    [ // Round 3
+      { q: "What stone did they use?", a: "B", options: ["Granite", "Basalt", "Marble"] },
+      { q: "What sport did they play?", a: "C", options: ["Football", "Chess", "Ball game"] },
+      { q: "What did their heads show?", a: "A", options: ["Leaders", "Animals", "Gods"] }
+    ]
+  ];
+
+  let currentRound = 0;
+  let score = 0;
+
+  function startGame() {
+    document.getElementById('start-screen').classList.remove('active');
+    document.getElementById('quiz-screen').classList.add('active');
+    showRound();
+  }
+
+  function showRound() {
+    document.getElementById('round-title').innerText = `Round ${currentRound + 1}`;
+    const questions = rounds[currentRound];
+    const container = document.getElementById('questions-container');
+    container.innerHTML = '';
+
+    questions.forEach((q, index) => {
+      const div = document.createElement('div');
+      div.classList.add('question');
+      div.innerHTML = `<h3>${q.q}</h3>`;
+      q.options.forEach((opt, i) => {
+        const letter = String.fromCharCode(65 + i);
+        div.innerHTML += `<label><input type="radio" name="q${index}" value="${letter}" required> ${opt}</label>`;
+      });
+      container.appendChild(div);
+    });
+
+    document.getElementById('quiz-form').onsubmit = function(e) {
+      e.preventDefault();
+      const form = new FormData(e.target);
+      let correct = 0;
+      rounds[currentRound].forEach((q, i) => {
+        if (form.get(`q${i}`) === q.a) correct++;
+      });
+      score += correct;
+      currentRound++;
+      if (currentRound < rounds.length) {
+        showRound();
+      } else {
+        endGame();
+      }
+    };
+  }
+
+  function endGame() {
+    document.getElementById('quiz-screen').classList.remove('active');
+    document.getElementById('end-screen').classList.add('active');
+    document.getElementById('final-score').innerText = `Your final score is ${score} out of ${rounds.length * 3}`;
+  }
+
+  function restartGame() {
+    score = 0;
+    currentRound = 0;
+    document.getElementById('end-screen').classList.remove('active');
+    document.getElementById('start-screen').classList.add('active');
+  }
+</script>
+
+</body>
+</html>
